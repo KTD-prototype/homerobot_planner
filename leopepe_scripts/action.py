@@ -61,6 +61,33 @@ class ActionResponse:
             self.response = self.stderr
 
 
+class ShellAction(Action):
+    def __init__(self, name: str, pre_conditions: dict, effects: dict, shell: str, const: float=0.0):
+        self.response = {}
+        self.type = 'shell'
+        self.shell = shell
+        Action.__init__(
+            self, name=name, pre_conditions=pre_conditions, effects=effects, cost=cost)
+
+    def exec(self):
+        cmd = self.shell
+        process = subprocess.Popen(
+            cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True)
+        try:
+            stdout, stderr = process.communicate(timeout=30)
+            return_code = process.returncode
+            self.response = ActionResponse(
+                name=self.name, action_type='shell', stdout=stdout, stderr=stderr, return_code=return_code)
+
+        except TimeoutError as e:
+            process.kill()
+            raise('{}'.format(e))
+        finally:
+            process.kill()
+
+        return self.response
+
+
 class Actions:
     def __init__(self):
         self.actions = list()
