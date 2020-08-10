@@ -31,9 +31,11 @@ class World:
         self.planners = []
         self.plans = []
 
+    # function to append a certain planner to the ARRAY:PLANNERS
     def add_planner(self, planner):
         self.planners.append(planner)
 
+    # function to append an actual plans based on each planners which are contained to the ARREY:PLANNERS
     def calculate(self):
         self.plans = []
         for planner in self.planners:
@@ -67,36 +69,59 @@ class World:
 
 
 class Planner:
+    # initialize an instance of the Planner
     def __init__(self, *keys):
+        # get the possible states (e.g. has_food) as an arguments:*keys
+
         self.start_state = None
         self.goal_state = None
+
+        # initialize all values as -1, correspondent to the keys
         self.values = {k: -1 for k in keys}
         self.action_list = None
+
+        # print("keys : " + str(keys))
+        # print("values : " + str(self.values))
+        # print(self.start_state, self.goal_state, self.action_list)
 
     def state(self, **kwargs):
         _new_state = self.values.copy()
         _new_state.update(kwargs)
         return _new_state
 
+    # set a start state with check exceptions
     def set_start_state(self, **kwargs):
         _invalid_states = set(kwargs.keys()) - set(self.values.keys())
 
-        if _invalid_state:
+        # print(set(kwargs.keys()))      # a list of start state which has been set as a start_state
+        # print(set(self.values.keys())) # a list of possible states of this planner
+        # print(_invalid_states)
+        # if there're mismatches between possible states of this planner and start_state
+        # all of the items in start_state should be included in the list of possible states of the planner
+        if _invalid_states:
             raise Exception('Invalid states for world start state: %s' %
                             ', '.join(list(_invalid_states)))
         self.start_state = self.state(**kwargs)
 
+    # set a goal state with check exceptions
     def set_goal_state(self, **kwargs):
         _invalid_states = set(kwargs.keys()) - set(self.values.keys())
 
-        if __invalid_states:
+        print(set(kwargs.keys()))      # a list of start state which has been set as a goal_state
+        print(set(self.values.keys())) # a list of possible states of this planner
+        print(_invalid_states)
+        # if there're mismatches between possible states of this planner and start_state
+        # all of the items in goal_state should be included in the list of possible states of the planner
+        if _invalid_states:
             raise Exception('Invalid states for world goal state: %s' %
                             ', '.join(list(_invalid_states)))
         self.goal_state = self.state(**kwargs)
 
+    # set an action list
     def set_action_list(self, action_list):
         self.action_list = action_list
 
+    # calculate the length-cost of chained action plans by A* algorithm
     def calculate(self):
         return astar(self.start_state,
                      self.goal_state,
@@ -107,7 +132,8 @@ class Planner:
                      self.action_list.weights.copy())
 
 
-class ActionList:
+# class to define the list of actions
+class Action_List:
     def __init__(self):
         self.conditions = {}
         self.reactions = {}
@@ -122,6 +148,7 @@ class ActionList:
         return self.conditions[key].update(kwargs)
 
     def add_reaction(self, key, **kwargs):
+        # if there're no correspondent condition, output an exception
         if not key in self.conditions:
             raise Exception(
                 'Trying to add reaction \'%s\' without matching condition.' % key)
@@ -168,7 +195,7 @@ def distance_to_state(state_1, state_2):
 
 
 def conditions_are_met(state_1, state_2):
-    # print state_1, state_2
+    print state_1, state_2
     for key in state_2.keys():
         _value = state_2[key]
 
@@ -189,13 +216,14 @@ def node_in_list(node, node_list):
     return False
 
 
-def create_node(path, sate, name=''):
+def create_node(path, state, name=''):
     path['node_id'] += 1
     path['nodes'][path['node_id']] = {
         'state': state, 'f': 0, 'g': 0, 'h': 0, 'p_id': None, 'id': path['node_id'], 'name': name}
     return path['nodes'][path['node_id']]
 
 
+# calculate the length-cost of chained action plans by A* algorithm
 def astar(start_state, goal_state, actions, reactions, weight_table):
     _path = {'nodes': {},
              'node_id': 0,
