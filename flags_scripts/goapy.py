@@ -107,9 +107,9 @@ class Planner:
     def set_goal_state(self, **kwargs):
         _invalid_states = set(kwargs.keys()) - set(self.values.keys())
 
-        print(set(kwargs.keys()))      # a list of start state which has been set as a goal_state
-        print(set(self.values.keys())) # a list of possible states of this planner
-        print(_invalid_states)
+        # print(set(kwargs.keys()))      # a list of start state which has been set as a goal_state
+        # print(set(self.values.keys())) # a list of possible states of this planner
+        # print(_invalid_states)
         # if there're mismatches between possible states of this planner and start_state
         # all of the items in goal_state should be included in the list of possible states of the planner
         if _invalid_states:
@@ -120,6 +120,8 @@ class Planner:
     # set an action list
     def set_action_list(self, action_list):
         self.action_list = action_list
+        # print(self.action_list.reactions)
+        # print(self.action_list.reactions['go_to_kitchen'])
 
     # calculate the length-cost of chained action plans by A* algorithm
     def calculate(self):
@@ -138,31 +140,44 @@ class Action_List:
         self.conditions = {}
         self.reactions = {}
         self.weights = {}
+        # print(self.conditions, self.reactions, self.weights)
 
+    # add condition to some kind of action library
+    # 1st arg is a name of the action, and followings are conditions that the action can be executed
     def add_condition(self, key, **kwargs):
+        # add the key to the key of the condition library:self.weights
         if not key in self.weights:
             self.weights[key] = 1
+        
+        # add to the condition library:self.conditions
         if not key in self.conditions:
             self.conditions[key] = kwargs
 
+        # print(self.weights, self.conditions)
+        # print(self.conditions[key].update(kwargs)) 
         return self.conditions[key].update(kwargs)
 
+    # add reaction to some kind of action liberary
+    # 1st arg is a name of the action, and followings are conditions that are changed as an reaction for the action
     def add_reaction(self, key, **kwargs):
         # if there're no correspondent condition, output an exception
         if not key in self.conditions:
             raise Exception(
                 'Trying to add reaction \'%s\' without matching condition.' % key)
 
+        # add to the reaction library:self.reactions
         if not key in self.reactions:
             self.reactions[key] = kwargs
 
         return self.reactions[key].update(kwargs)
 
+    # set weights of each actions : the default are set as 1
     def set_weight(self, key, value):
         if not key in self.conditions:
             raise Exception(
                 'Trying to set weight \'%s\' without matching condition.' % key)
         self.weights[key] = value
+        # print(self.weights)
 
 
 def distance_to_state(state_1, state_2):

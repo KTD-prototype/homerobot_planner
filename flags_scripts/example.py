@@ -36,4 +36,44 @@ if __name__ == '__main__':
     # set start state of the world
     _world.set_start_state(hungry=True, has_food=False,
                            in_kitchen=False, tired=True, in_bed=False)
-    _world.set_goal_state(tied=False)
+    # set goal state to reach
+    _world.set_goal_state(tired=False)
+
+    # make an instance of the class:Action_List as an action list
+    _actions = Action_List()
+
+    # add an action 'eat' with corresponding conditions and reactions
+    _actions.add_condition('eat', hungry=True, has_food=True, in_kitchen=False)
+    _actions.add_reaction('eat', hungry=False)
+
+    # add an action 'cook' with corresponding conditions and reactions
+    _actions.add_condition('cook', hungry=True,
+                           has_food=False, in_kitchen=True)
+    _actions.add_reaction('cook', has_food=True)
+
+    # add an action 'sleep' with correspondent conditions and reactions
+    _actions.add_condition('sleep', tired=True, in_bed=True)
+    _actions.add_reaction('sleep', tired=False)
+
+    # add an action 'go_to_bed' with correspondent conditions and reactions
+    _actions.add_condition('go_to_bed', in_bed=False, hungry=False)
+    _actions.add_reaction('go_to_bed', in_bed=True)
+
+    # add an action 'go_to_kitchen', with correspondent conditions and reactions
+    _actions.add_condition('go_to_kitchen', in_kitchen=False)
+    _actions.add_reaction('go_to_kitchen', in_kitchen=True)
+
+    # add an action 'leave_kitchen' with correspondent conditions and reactions
+    _actions.add_condition('leave_kitchen', in_kitchen=True)
+    _actions.add_reaction('leave_kitchen', in_kitchen=False)
+
+    # add and action 'order pizza' with correspondent conditions and reactions
+    _actions.add_condition('order_pizza', has_food=False, hungry=True)
+    _actions.add_reaction('order_pizza', has_food=True)
+
+    # set weight
+    _actions.set_weight('go_to_kitchen', 20)
+    _actions.set_weight('order_pizza', 1)
+
+    # set the all actions to the action list in the _world
+    _world.set_action_list(_actions)
