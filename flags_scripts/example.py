@@ -71,9 +71,20 @@ if __name__ == '__main__':
     _actions.add_condition('order_pizza', has_food=False, hungry=True)
     _actions.add_reaction('order_pizza', has_food=True)
 
-    # set weight
+    # set weight of the each actions
+    # if a weight of a certain action is big, then the planner becomes not to chose the action
     _actions.set_weight('go_to_kitchen', 20)
-    _actions.set_weight('order_pizza', 1)
+    _actions.set_weight('order_pizza', 1) 
 
     # set the all actions to the action list in the _world
     _world.set_action_list(_actions)
+
+    _t = time.time()    # get current time
+    _path = _world.calculate()  # calculate the cost from start to goal
+    _took_time = time.time() - _t  # calculate consumed time to follow the path
+
+    for path in _path:
+        print('')
+        print(_path.index(path)+1, path['name'])
+
+    print('\nTook: '+str(_took_time)+' seconds')

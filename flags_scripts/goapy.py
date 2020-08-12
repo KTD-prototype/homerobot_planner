@@ -102,6 +102,7 @@ class Planner:
             raise Exception('Invalid states for world start state: %s' %
                             ', '.join(list(_invalid_states)))
         self.start_state = self.state(**kwargs)
+        # print(self.start_state)
 
     # set a goal state with check exceptions
     def set_goal_state(self, **kwargs):
@@ -116,22 +117,30 @@ class Planner:
             raise Exception('Invalid states for world goal state: %s' %
                             ', '.join(list(_invalid_states)))
         self.goal_state = self.state(**kwargs)
+        # print(self.goal_state)
 
     # set an action list
     def set_action_list(self, action_list):
         self.action_list = action_list
+        # print('all conditions : ')
+        # print(self.action_list.conditions)
+        # print('')
+        # print('all reactions : ')
         # print(self.action_list.reactions)
+        # print('')
         # print(self.action_list.reactions['go_to_kitchen'])
 
     # calculate the length-cost of chained action plans by A* algorithm
     def calculate(self):
-        return astar(self.start_state,
-                     self.goal_state,
-                     {c: self.action_list.conditions[c].copy(
-                     ) for c in self.action_list.conditions},
-                     {r: self.action_list.reactions[r].copy(
-                     ) for r in self.action_list.reactions},
-                     self.action_list.weights.copy())
+        value_return = astar(self.start_state,
+                             self.goal_state,
+                             {c: self.action_list.conditions[c].copy(
+                             ) for c in self.action_list.conditions},
+                             {r: self.action_list.reactions[r].copy(
+                             ) for r in self.action_list.reactions},
+                             self.action_list.weights.copy())
+        # print(value_return)
+        return value_return
 
 
 # class to define the list of actions
@@ -148,13 +157,13 @@ class Action_List:
         # add the key to the key of the condition library:self.weights
         if not key in self.weights:
             self.weights[key] = 1
-        
+
         # add to the condition library:self.conditions
         if not key in self.conditions:
             self.conditions[key] = kwargs
 
         # print(self.weights, self.conditions)
-        # print(self.conditions[key].update(kwargs)) 
+        # print(self.conditions[key].update(kwargs))
         return self.conditions[key].update(kwargs)
 
     # add reaction to some kind of action liberary
@@ -210,7 +219,8 @@ def distance_to_state(state_1, state_2):
 
 
 def conditions_are_met(state_1, state_2):
-    print state_1, state_2
+    # print state_1, state_2
+    # print(state_2.keys())
     for key in state_2.keys():
         _value = state_2[key]
 
@@ -240,6 +250,7 @@ def create_node(path, state, name=''):
 
 # calculate the length-cost of chained action plans by A* algorithm
 def astar(start_state, goal_state, actions, reactions, weight_table):
+    # initialize the path
     _path = {'nodes': {},
              'node_id': 0,
              'goal': goal_state,
@@ -247,18 +258,39 @@ def astar(start_state, goal_state, actions, reactions, weight_table):
              'reactions': reactions,
              'weight_table': weight_table,
              'action_nodes': {},
-             'olist': {},
-             'clist': {}}
+             'olist': {}, # TODO:what is olist?
+             'clist': {}} # TODO:what is clist?
+
+    # show contents of the path
+    # print(_path)
+    print
+    # print('nodes : ' + str(_path['nodes']))
+    # print('node_id : ' + str(_path['node_id']))
+    # print('goal : ' + str(_path['goal']))
+    # print('actions : ' + str(_path['actions']))
+    # print('reactions : ' + str(_path['reactions']))
+    # print('weight_table : ' + str(_path['weight_table']))
+    # print('action_nodes : ' + str(_path['action_nodes']))
+    # print('olist : ' + str(_path['olist']))
+    # print('clist : ' + str(_path['clist']))
+    # print
 
     _start_node = create_node(_path, start_state, name='start')
-    _start_node['g'] = 0
-    _start_node['h'] = distance_to_state(start_state, goal_state)
+    _start_node['g'] = 0 # distance from start_node to current node(?)
+    _start_node['h'] = distance_to_state(start_state, goal_state) # distance from 
     _start_node['f'] = _start_node['g'] + _start_node['h']
     _path['olist'][_start_node['id']] = _start_node
+    # print('nodes : ' + str(_path['nodes']))
+    # print(_start_node)
+    # print(_path['olist'])
 
+    # print(actions)
     for action in actions:
         _path['action_nodes'][action] = create_node(
             _path, actions[action], name=action)
+        # print('nodes : ' + str(_path['nodes'][_path['node_id']]))
+        # print(_path['action_nodes'][action])
+    # print(_path)
 
     return walk_path(_path)
 
