@@ -132,6 +132,8 @@ class Planner:
 
     # calculate the length-cost of chained action plans by A* algorithm
     def calculate(self):
+        # latter 3 arguments are list of conditions, reactions, and weights
+        # TODO why not set them directly? like : self.action_list.reactions ?
         value_return = astar(self.start_state,
                              self.goal_state,
                              {c: self.action_list.conditions[c].copy(
@@ -139,6 +141,8 @@ class Planner:
                              {r: self.action_list.reactions[r].copy(
                              ) for r in self.action_list.reactions},
                              self.action_list.weights.copy())
+        # print({c: self.action_list.conditions[c].copy() for c in self.action_list.conditions})
+        # print(self.action_list.weights.copy())
         # print(value_return)
         return value_return
 
@@ -249,6 +253,7 @@ def create_node(path, state, name=''):
 
 
 # calculate the length-cost of chained action plans by A* algorithm
+# actual route seems to be calculated by the function : walk_path()
 def astar(start_state, goal_state, actions, reactions, weight_table):
     # initialize the path
     _path = {'nodes': {},
@@ -292,18 +297,25 @@ def astar(start_state, goal_state, actions, reactions, weight_table):
         # print(_path['action_nodes'][action])
     # print(_path)
 
+    print(walk_path(_path))
     return walk_path(_path)
 
 
+# function to calculate the shortest path by A* algorithm
 def walk_path(path):
     node = None
 
+    # print(path['clist']) # clist seems to be empty for now....
     _clist = path['clist']
+
+    # print(path['olist']) # olist seems to be a start condition....
     _olist = path['olist']
+    # print(len(_olist)) # olist contains a single item : start_condition, so the length of it is 1 
 
     while len(_olist):
         # find lowest node
         _lowest = {'node': None, 'f': 9000000}
+        # print(_olist.values())
         for next_node in _olist.values():
             if not _lowest['node'] or next_node['f'] < _lowest['f']:
                 _lowest['node'] = next_node['id']
