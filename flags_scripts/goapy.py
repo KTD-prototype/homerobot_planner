@@ -297,7 +297,7 @@ def astar(start_state, goal_state, actions, reactions, weight_table):
         # print(_path['action_nodes'][action])
     # print(_path)
 
-    print(walk_path(_path))
+    # print(walk_path(_path))
     return walk_path(_path)
 
 
@@ -323,11 +323,13 @@ def walk_path(path):
 
         if _lowest['node']:
             node = path['nodes'][_lowest['node']]
-
+            # print(_lowest['node'])
         else:
+            print('else')
             return
 
         # remove node with lowest rank
+        # print(_olist[node['id']])
         del _olist[node['id']]
 
         # if it matches the goal, we are done
