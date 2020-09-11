@@ -164,3 +164,5 @@ if __name__ == '__main__':
     _brain.add_planner(_heal_brain)
 
     # calculate the chain of actions with lowest cost
+    _brain.calculate()
+    _brain.get_plan(debug=True)
