@@ -27,16 +27,75 @@
 
 from goapy import World, Planner, Action_List
 
-if __name__=='__main__':
+if __name__ == '__main__':
     import time
 
     # initialize the brain by the class:World
     _brain = World()
 
     # initialize carry_brain with the list of states
-    _carry_brain = Planner('know_place_of_object',
+    _carry_brain = Planner('know_what_to_carry',
+                           'know_place_of_object',
                            'in_front_of_object',
-                           'know_what_to_carry'
+                           'picking_up_object'
                            'have_object',
-                           'know_place_of_destination',
-                           'reached_destination')
+                           'know_where_to_carry',
+                           'reached_destination',
+                           'delivered_object',
+                           'said_to_start_carry',
+                           'said_to_stop')
+
+    # initialize carry brain with the start state
+    _carry_brain.set_start_state(know_what_to_carry=False,
+                                 know_place_of_obect=False,
+                                 in_front_of_object=False,
+                                 picking_up_object=False,
+                                 have_object=False,
+                                 know_where_to_carry=False,
+                                 reached_destination=False,
+                                 delivered_object=False,
+                                 said_to_start_carry=False,
+                                 said_to_stop=False)
+
+    # set a goal
+    _carry_brain.set_goal_state(delivered_object=True)
+
+    # initialize the action list
+    _carry_actions = Action_List()
+
+    # add actions
+    _carry_actions.add_condition('get_object_name',
+                                 have_object=False,
+                                 picking_up_object=False)
+    _carry_actions.add_reaction('get_object_name',
+                                know_what_to_carry=True)
+
+    _carry_actions.add_condition('get_object_location',
+                                 have_object=False,
+                                 picking_up_object=False)
+    _carry_actions.add_reaction('get_object_location',
+                                know_place_of_object=True)
+
+    _carry_actions.add_condition('get_destination')
+    _carry_actions.add_reaction('get_destination',
+                                know_where_to_carry=True)
+
+    _carry_actions.add_condition('move_to_object_location',
+                                 know_place_of_object=True,
+                                 in_front_of_object=False,
+                                 have_object=False,,
+                                 picking_up_object=False,
+                                 said_to_stop=False)
+    _carry_actions.add_reaction('move_to_object_location',
+                                in_front_of_object=True)
+
+    _carry_actions.add_condition('start_pickup_object',
+                                 in_front_of_object=True,
+                                 have_object=False)
+    _carry_actions.add_reaction('pickup_object',
+                                have_object=True)
+
+    _carry_actions.add_condition('carry',
+                                 have_object=True)
+    _carry_actions.add_reaction('get_object_location',
+                                know_place_of_object=True)
