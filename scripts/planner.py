@@ -53,12 +53,12 @@ if __name__ == '__main__':
                                  have_object=False,
                                  know_where_to_carry=False,
                                  reached_destination=False,
-                                 delivered_object=False,
                                  said_to_start_carry=False,
-                                 said_to_stop=False)
+                                 said_to_stop=False,
+                                 carry_complete=False)
 
     # set a goal
-    _carry_brain.set_goal_state(delivered_object=True)
+    _carry_brain.set_goal_state(carry_complete=True)
 
     # initialize the action list
     _carry_actions = Action_List()
